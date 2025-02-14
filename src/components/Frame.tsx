@@ -22,17 +22,28 @@ import { createStore } from "mipd";
 import { Label } from "~/components/ui/label";
 import { PROJECT_TITLE } from "~/lib/constants";
 
-function ExampleCard() {
+function AuroraAlert({ status, lastUpdated }: { status: string; lastUpdated: string }) {
+  const hasAlert = status.toLowerCase() !== DEFAULT_ALERT_MESSAGE.toLowerCase();
+  
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Welcome to the Frame Template</CardTitle>
+        <CardTitle>Northern Lights Alert</CardTitle>
         <CardDescription>
-          This is an example card that you can customize or remove
+          {hasAlert ? "Aurora activity detected!" : "Current aurora status"}
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Label>Place content in a Card here.</Label>
+      <CardContent className="space-y-4">
+        <div className="flex flex-col items-center">
+          <span className={`text-2xl ${hasAlert ? 'text-yellow-500' : 'text-green-500'}`}>
+            {hasAlert ? "⚠️ Active Alert" : "✅ All Clear"}
+          </span>
+          <Label className="mt-2 text-center">{status}</Label>
+        </div>
+        
+        <div className="text-sm text-gray-500 dark:text-gray-400 text-center">
+          Last checked: {lastUpdated}
+        </div>
       </CardContent>
     </Card>
   );
@@ -41,6 +52,8 @@ function ExampleCard() {
 export default function Frame() {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [context, setContext] = useState<Context.FrameContext>();
+  const [alertStatus, setAlertStatus] = useState(DEFAULT_ALERT_MESSAGE);
+  const [lastChecked, setLastChecked] = useState(new Date().toLocaleString());
 
   const [added, setAdded] = useState(false);
 
@@ -140,7 +153,23 @@ export default function Frame() {
         <h1 className="text-2xl font-bold text-center mb-4 text-gray-700 dark:text-gray-300">
           {PROJECT_TITLE}
         </h1>
-        <ExampleCard />
+        <AuroraAlert status={alertStatus} lastUpdated={lastChecked} />
+        
+        <div className="mt-4 flex justify-center">
+          <button 
+            className="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded-lg"
+            onClick={async () => {
+              // TODO: Implement actual RSS feed parsing
+              const mockStatus = Math.random() > 0.5 
+                ? "Geomagnetic storm warning! High aurora activity expected!" 
+                : DEFAULT_ALERT_MESSAGE;
+              setAlertStatus(mockStatus);
+              setLastChecked(new Date().toLocaleString());
+            }}
+          >
+            Check Latest Forecast
+          </button>
+        </div>
       </div>
     </div>
   );
